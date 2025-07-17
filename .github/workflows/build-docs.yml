@@ -1,11 +1,6 @@
 name: Build documentation
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  workflow_dispatch:
 jobs:
   build-docs:
     runs-on: ubuntu-22.04
