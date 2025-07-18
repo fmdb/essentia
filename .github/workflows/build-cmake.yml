@@ -22,7 +22,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libeigen3-dev libyaml-dev libfftw3-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libsamplerate0-dev libtag1-dev libchromaprint-dev
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
@@ -35,9 +35,7 @@ jobs:
         with:
           name: essentia-ubuntu-${{env.BUILD_TYPE}}
           path: |
-            build/src/libessentia*
-            build/src/examples/${{env.BUILD_TYPE}}/*
-            build/src/python/_essentia*
+            build/*
 
   macos:
     name: MacOS (build and test)
@@ -53,7 +51,7 @@ jobs:
         run: brew install eigen libyaml fftw ffmpeg libsamplerate libtag chromaprint
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
@@ -66,9 +64,7 @@ jobs:
         with:
           name: essentia-macos-${{env.BUILD_TYPE}}
           path: |
-            build/src/libessentia*
-            build/src/examples/${{env.BUILD_TYPE}}/*
-            build/src/python/_essentia*
+            build/*
 
   windows:
     name: Windows (build and test)
@@ -87,7 +83,7 @@ jobs:
         run: .\packaging\build-dependencies-msvc.bat --with-tensorflow
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
 
       - name: Build
         run: |
