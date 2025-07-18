@@ -20,15 +20,24 @@ jobs:
 
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libeigen3-dev libyaml-dev libfftw3-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libsamplerate0-dev libtag1-dev libchromaprint-dev
-  
+
       - name: Configure
-        run: cmake -B build
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
 
       - name: Test
         run: ctest --test-dir build --output-on-failure -C ${{env.BUILD_TYPE}}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: essentia-ubuntu-${{env.BUILD_TYPE}}
+          path: |
+            build/src/libessentia*
+            build/src/examples/${{env.BUILD_TYPE}}/*
+            build/src/python/_essentia*
 
   macos:
     name: MacOS (build and test)
@@ -42,15 +51,24 @@ jobs:
 
       - name: Install dependencies
         run: brew install eigen libyaml fftw ffmpeg libsamplerate libtag chromaprint
-        
+
       - name: Configure
-        run: cmake -B build
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
 
       - name: Test
         run: ctest --test-dir build --output-on-failure -C ${{env.BUILD_TYPE}}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: essentia-macos-${{env.BUILD_TYPE}}
+          path: |
+            build/src/libessentia*
+            build/src/examples/${{env.BUILD_TYPE}}/*
+            build/src/python/_essentia*
 
   windows:
     name: Windows (build and test)
@@ -67,9 +85,9 @@ jobs:
 
       - name: Install dependencies
         run: .\packaging\build-dependencies-msvc.bat --with-tensorflow
-        
+
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
 
       - name: Build
         run: |
@@ -80,3 +98,13 @@ jobs:
         run: |
           set PATH=%PATH%;%CD%\packaging\msvc\bin
           ctest --test-dir build --output-on-failure -C ${{env.BUILD_TYPE}}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: essentia-windows-${{env.BUILD_TYPE}}
+          path: |
+            build/src/${{env.BUILD_TYPE}}/essentia*
+            build/src/examples/${{env.BUILD_TYPE}}/*
+            build/src/python/${{env.BUILD_TYPE}}/_essentia*
+            packaging/msvc/bin/*.dll

@@ -3,7 +3,7 @@ if (MSVC)
     # In case of errors reporting missing exports, this option might help.
     #set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS YES)
   endif()
-  
+
   # The following compile definitions are necessary to properly setup
   # the "__declspec" attribute for Chromaprint, Yaml or TagLib.
   if (ENABLE_STATIC_DEPENDENCIES)
