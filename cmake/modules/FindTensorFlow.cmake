@@ -44,7 +44,7 @@ The following cache variables may also be set:
 find_package(PkgConfig QUIET)
 
 if (PKG_CONFIG_FOUND)
-  pkg_check_modules(PC_TensorFlow libtensorflow QUIET)
+  pkg_check_modules(PC_TensorFlow tensorflow QUIET)
 endif ()
 
 find_path(TensorFlow_INCLUDE_DIR
@@ -54,6 +54,16 @@ find_path(TensorFlow_INCLUDE_DIR
     /usr/local/include
     /usr/include
     /opt/homebrew/include
+    /opt/homebrew/Cellar/libtensorflow/*/include
+    # Also look for the tensorflow subdirectory structure
+    /usr/local/include/tensorflow
+    /usr/include/tensorflow
+    /opt/homebrew/include/tensorflow
+    /opt/homebrew/Cellar/libtensorflow/*/include/tensorflow
+    # Common Linux paths for TensorFlow C API
+    /usr/local/include/tensorflow/c
+    /usr/include/tensorflow/c
+    PATH_SUFFIXES tensorflow
 )
 
 find_library(TensorFlow_LIBRARY
@@ -63,6 +73,12 @@ find_library(TensorFlow_LIBRARY
     /usr/local/lib
     /usr/lib
     /opt/homebrew/lib
+    /opt/homebrew/Cellar/libtensorflow/*/lib
+    # Linux-specific library paths
+    /usr/lib/x86_64-linux-gnu
+    /usr/lib/aarch64-linux-gnu
+    /usr/local/lib64
+    /usr/lib64
 )
 
 set(TensorFlow_VERSION ${PC_TensorFlow_VERSION})
