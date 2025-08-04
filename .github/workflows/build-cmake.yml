@@ -54,8 +54,21 @@ jobs:
 
       - name: Setup TensorFlow C++ libraries
         run: |
-          cd src/3rdparty/tensorflow
-          python3 setup_tensorflow.py -m libtensorflow -p macos -c /usr/local/ -v 2.5.0
+          # Download and install TensorFlow C API for macOS
+          if [[ $(uname -m) == "arm64" ]]; then
+            # macOS ARM64 - use TensorFlow 2.18.0 (last available version)
+            wget https://storage.googleapis.com/tensorflow/versions/2.18.0/libtensorflow-cpu-darwin-arm64.tar.gz
+            sudo tar -C /usr/local -xzf libtensorflow-cpu-darwin-arm64.tar.gz
+            rm libtensorflow-cpu-darwin-arm64.tar.gz
+          else
+            # macOS x86_64 - use TensorFlow 2.16.2 (last available version)
+            wget https://storage.googleapis.com/tensorflow/versions/2.16.2/libtensorflow-cpu-darwin-x86_64.tar.gz
+            sudo tar -C /usr/local -xzf libtensorflow-cpu-darwin-x86_64.tar.gz
+            rm libtensorflow-cpu-darwin-x86_64.tar.gz
+          fi
+          # Copy the C headers that Essentia expects
+          sudo mkdir -p /usr/local/include/tensorflow/c
+          sudo cp -r src/3rdparty/tensorflow/c/* /usr/local/include/tensorflow/c/
 
       - name: Configure
         run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
