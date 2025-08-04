@@ -6,6 +6,7 @@ on:
 env:
   # CMake build type (Debug, Release, RelWithDebInfo or MinSizeRel)
   BUILD_TYPE: Debug
+  BUILD_EXAMPLES: "standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict;standard_chromaprinter"
 
 jobs:
   ubuntu:
@@ -18,11 +19,12 @@ jobs:
         with:
           submodules: 'true'
 
+      # Handle Tensorflow installation
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libeigen3-dev libyaml-dev libfftw3-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libsamplerate0-dev libtag1-dev libchromaprint-dev
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
@@ -48,10 +50,15 @@ jobs:
           submodules: 'true'
 
       - name: Install dependencies
-        run: brew install eigen libyaml fftw ffmpeg libsamplerate libtag chromaprint
+        run: brew install eigen fftw ffmpeg libsamplerate libtag chromaprint
+
+      - name: Setup TensorFlow C++ libraries
+        run: |
+          cd src/3rdparty/tensorflow
+          python3 setup_tensorflow.py -m libtensorflow -p macos -c /usr/local/ -v 2.5.0
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
@@ -83,7 +90,7 @@ jobs:
         run: .\packaging\build-dependencies-msvc.bat --with-tensorflow
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
 
       - name: Build
         run: |
