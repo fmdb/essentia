@@ -51,8 +51,8 @@ int main(int argc, char* argv[]) {
   int frameSize = 1024;
   int hopSize = 1024;
   vector<int> inputShape({-1, 1, 128, 128});
-  vector<string> inputs({"model/Placeholder"});
-  vector<string> outputs({"model/Softmax"});
+  vector<string> inputs({"serving_default_model_Placeholder"});
+  vector<string> outputs({"PartitionedCall"});
 
   // we want to compute the MFCC of a file: we need the create the following:
   // audioloader -> framecutter -> windowing -> FFT -> MFCC -> PoolStorage
@@ -91,17 +91,17 @@ int main(int argc, char* argv[]) {
 
   Algorithm* ttp      = factory.create("TensorToPool",
                                        "mode", "overwrite",
-                                       "namespace", "model/Placeholder");
+                                       "namespace", "serving_default_model_Placeholder");
 
   Algorithm* tfp      = factory.create("TensorflowPredict",
                                        "graphFilename", modelName,
                                        "inputs", inputs,
                                        "outputs", outputs,
                                        "isTraining", false,
-                                       "isTrainingName", "model/Placeholder_1");
+                                       "isTrainingName", "serving_default_model_Placeholder_1");
                                    
   Algorithm* ptt      = factory.create("PoolToTensor",
-                                       "namespace", "model/Softmax");
+                                       "namespace", "PartitionedCall");
                                    
   Algorithm* ttv      = factory.create("TensorToVectorReal");
                                    
