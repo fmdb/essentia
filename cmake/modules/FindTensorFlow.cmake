@@ -50,11 +50,19 @@ endif ()
 find_path(TensorFlow_INCLUDE_DIR
   NAMES tensorflow/c/c_api.h
   HINTS ${PC_TensorFlow_INCLUDE_DIRS}
+  PATHS
+    /usr/local/include
+    /usr/include
+    /opt/homebrew/include
 )
 
 find_library(TensorFlow_LIBRARY
   NAMES tensorflow
   HINTS ${PC_TensorFlow_LIBRARY_DIRS}
+  PATHS
+    /usr/local/lib
+    /usr/lib
+    /opt/homebrew/lib
 )
 
 set(TensorFlow_VERSION ${PC_TensorFlow_VERSION})
