@@ -23,6 +23,18 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libeigen3-dev libyaml-dev libfftw3-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libsamplerate0-dev libtag1-dev libchromaprint-dev
 
+      - name: Setup TensorFlow C++ libraries
+        run: |
+          # Download and install TensorFlow C API for Linux
+          wget https://storage.googleapis.com/tensorflow/versions/2.18.0/libtensorflow-cpu-linux-x86_64.tar.gz
+          sudo tar -C /usr/local -xzf libtensorflow-cpu-linux-x86_64.tar.gz
+          rm libtensorflow-cpu-linux-x86_64.tar.gz
+          # Copy the C headers that Essentia expects
+          sudo mkdir -p /usr/local/include/tensorflow/c
+          sudo cp -r src/3rdparty/tensorflow/c/* /usr/local/include/tensorflow/c/
+          # Update library cache
+          sudo ldconfig
+
       - name: Configure
         run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="${{env.BUILD_EXAMPLES}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 

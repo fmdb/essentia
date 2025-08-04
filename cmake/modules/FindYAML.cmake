@@ -50,11 +50,21 @@ endif ()
 find_path(yaml_INCLUDE_DIR
   NAMES yaml.h
   HINTS ${PC_YAML_INCLUDE_DIRS}
+  PATHS
+    /usr/include
+    /usr/local/include
+    /opt/homebrew/include
 )
 
 find_library(yaml_LIBRARY
   NAMES yaml
   HINTS ${PC_YAML_LIBRARY_DIRS}
+  PATHS
+    /usr/lib
+    /usr/local/lib
+    /opt/homebrew/lib
+    /usr/lib/x86_64-linux-gnu
+    /usr/lib/aarch64-linux-gnu
 )
 
 set(yaml_VERSION ${PC_YAML_VERSION})
