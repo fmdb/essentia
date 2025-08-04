@@ -11,7 +11,7 @@ env:
 jobs:
   ubuntu:
     name: Ubuntu (build and test)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -24,7 +24,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libeigen3-dev libyaml-dev libfftw3-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libsamplerate0-dev libtag1-dev libchromaprint-dev
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="${{env.BUILD_EXAMPLES}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
@@ -41,7 +41,7 @@ jobs:
 
   macos:
     name: MacOS (build and test)
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
       - name: Checkout code
@@ -71,7 +71,7 @@ jobs:
           sudo cp -r src/3rdparty/tensorflow/c/* /usr/local/include/tensorflow/c/
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="${{env.BUILD_EXAMPLES}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
