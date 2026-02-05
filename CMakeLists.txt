@@ -30,7 +30,7 @@ option(STRIP_DOCUMENTATION "Strip documentation from binaries" OFF)
 
 mark_as_advanced(DEBUGGING_ENABLED STRIP_DOCUMENTATION)
 
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.3...5.99 REQUIRED NO_MODULE)
 find_package(FFmpeg)
 find_package(SampleRate)
 find_package(Taglib)
