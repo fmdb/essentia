@@ -1,29 +1,43 @@
 name: Build with CMake
 
 on:
+  push:
+    branches:
+      - cmake
+  pull_request:
+    branches:
+      - cmake
   workflow_dispatch:
 
 env:
   # CMake build type (Debug, Release, RelWithDebInfo or MinSizeRel)
-  BUILD_TYPE: Debug
-  BUILD_EXAMPLES: "standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict;standard_chromaprinter"
+  BUILD_TYPE: Release
 
 jobs:
   ubuntu:
-    name: Ubuntu (build and test)
+    name: Ubuntu (TensorFlow ${{matrix.tensorflow}})
     runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tensorflow: "ON"
+            examples: "standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict;standard_chromaprinter"
+          - tensorflow: "OFF"
+            examples: "streaming_extractor_music;standard_chromaprinter"
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: 'true'
 
-      # Handle Tensorflow installation
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libeigen3-dev libyaml-dev libfftw3-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libsamplerate0-dev libtag1-dev libchromaprint-dev
 
       - name: Setup TensorFlow C++ libraries
+        if: matrix.tensorflow == 'ON'
         run: |
           # Download and install TensorFlow C API for Linux
           wget https://storage.googleapis.com/tensorflow/versions/2.18.0/libtensorflow-cpu-linux-x86_64.tar.gz
@@ -36,7 +50,7 @@ jobs:
           sudo ldconfig
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="${{env.BUILD_EXAMPLES}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_TENSORFLOW=${{matrix.tensorflow}} -DCMAKE_REQUIRE_FIND_PACKAGE_TensorFlow=${{matrix.tensorflow}} -DBUILD_EXAMPLES="${{matrix.examples}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
@@ -45,19 +59,28 @@ jobs:
         run: ctest --test-dir build --output-on-failure -C ${{env.BUILD_TYPE}}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: essentia-ubuntu-${{env.BUILD_TYPE}}
+          name: essentia-ubuntu-${{env.BUILD_TYPE}}-tensorflow-${{matrix.tensorflow}}
           path: |
             build/*
 
   macos:
-    name: MacOS (build and test)
-    runs-on: macos-14
+    name: MacOS (TensorFlow ${{matrix.tensorflow}})
+    runs-on: macos-15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tensorflow: "ON"
+            examples: "standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict;standard_chromaprinter"
+          - tensorflow: "OFF"
+            examples: "streaming_extractor_music;standard_chromaprinter"
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: 'true'
 
@@ -65,6 +88,7 @@ jobs:
         run: brew install eigen fftw ffmpeg libsamplerate libtag chromaprint
 
       - name: Setup TensorFlow C++ libraries
+        if: matrix.tensorflow == 'ON'
         run: |
           # Download and install TensorFlow C API for macOS
           if [[ $(uname -m) == "arm64" ]]; then
@@ -83,7 +107,7 @@ jobs:
           sudo cp -r src/3rdparty/tensorflow/c/* /usr/local/include/tensorflow/c/
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES="${{env.BUILD_EXAMPLES}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUSE_TENSORFLOW=${{matrix.tensorflow}} -DCMAKE_REQUIRE_FIND_PACKAGE_TensorFlow=${{matrix.tensorflow}} -DBUILD_EXAMPLES="${{matrix.examples}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: cmake --build build --config ${{env.BUILD_TYPE}}
@@ -92,30 +116,44 @@ jobs:
         run: ctest --test-dir build --output-on-failure -C ${{env.BUILD_TYPE}}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: essentia-macos-${{env.BUILD_TYPE}}
+          name: essentia-macos-${{env.BUILD_TYPE}}-tensorflow-${{matrix.tensorflow}}
           path: |
             build/*
 
   windows:
-    name: Windows (build and test)
+    name: Windows (TensorFlow ${{matrix.tensorflow}})
     runs-on: windows-2022
     defaults:
       run:
         shell: cmd
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tensorflow: "ON"
+            examples: "standard_tempocnn;streaming_extractor_music;streaming_musicnn_predict;streaming_tensorflowpredict;streaming_vggish_predict;standard_chromaprinter"
+          - tensorflow: "OFF"
+            examples: "streaming_extractor_music;standard_chromaprinter"
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: 'true'
 
+      - name: Install dependencies (with TensorFlow)
+        if: matrix.tensorflow == 'ON'
+        run: .\packaging\build-dependencies-msvc.bat --build-type ${{env.BUILD_TYPE}} --with-tensorflow
+
       - name: Install dependencies
-        run: .\packaging\build-dependencies-msvc.bat --with-tensorflow
+        if: matrix.tensorflow == 'OFF'
+        run: .\packaging\build-dependencies-msvc.bat --build-type ${{env.BUILD_TYPE}}
 
       - name: Configure
-        run: cmake -B build -DUSE_TENSORFLOW=ON -DBUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
+        run: cmake -B build -DUSE_TENSORFLOW=${{matrix.tensorflow}} -DCMAKE_REQUIRE_FIND_PACKAGE_TensorFlow=${{matrix.tensorflow}} -DBUILD_EXAMPLES="${{matrix.examples}}" -DENABLE_STATIC_DEPENDENCIES=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=%CD%\packaging\msvc
 
       - name: Build
         run: |
@@ -128,9 +166,9 @@ jobs:
           ctest --test-dir build --output-on-failure -C ${{env.BUILD_TYPE}}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
-          name: essentia-windows-${{env.BUILD_TYPE}}
+          name: essentia-windows-${{env.BUILD_TYPE}}-tensorflow-${{matrix.tensorflow}}
           path: |
             build/src/${{env.BUILD_TYPE}}/essentia*
             build/src/examples/${{env.BUILD_TYPE}}/*
