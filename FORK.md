@@ -39,6 +39,8 @@ git remote add upstream https://github.com/MTG/essentia     # reference only
 
 **Prefer upstreaming over carrying.** Every locally-carried change is a change that must survive every future rebase.
 
+**This repository is public. Keep internal references out of it.** No issue-tracker IDs, internal URLs, or ticket footers in commit messages, branch names, or pull request descriptions — they leak into a repository that is world-readable and, once pushed, cannot be fully retracted: GitHub keeps serving orphaned commits by SHA after a force-push, and a merged pull request's head branch name is permanent. Describe *what* changed and *why*; track the *who asked* elsewhere.
+
 The procedure:
 
 ```bash
