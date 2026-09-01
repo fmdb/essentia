@@ -6,6 +6,10 @@ Essentia
 [![PyPI downloads: essentia-tensorflow](https://img.shields.io/pypi/dm/essentia-tensorflow.svg?label=PyPI%20downloads:%20essentia-tensorflow)](https://pypi.org/project/essentia-tensorflow/)
 
 
+> **This is a fork.** Upstream is [wo80/essentia](https://github.com/wo80/essentia), branch `cmake` — not MTG/essentia, which has no CMake build.
+> Read [FORK.md](FORK.md) before rebasing, adding a remote, or fixing a build problem.
+
+
 Essentia is an open-source C++ library for audio analysis and audio-based music information retrieval released under the Affero GPLv3 license. It contains an extensive collection of reusable algorithms which implement audio input/output functionality, standard digital signal processing blocks, statistical characterization of data, and a large set of spectral, temporal, tonal and high-level music descriptors. The library is also wrapped in Python and includes a number of predefined executable extractors for the available music descriptors, which facilitates its use for fast prototyping and allows setting up research experiments very rapidly. Furthermore, it includes a Vamp plugin to be used with Sonic Visualiser for visualization purposes. Essentia is designed with a focus on the robustness of the provided music descriptors and is optimized in terms of the computational cost of the algorithms. The provided functionality, specifically the music descriptors included in-the-box and signal processing algorithms, is easily expandable and allows for both research experiments and development of large-scale industrial applications.
 
 Documentation online: http://essentia.upf.edu
