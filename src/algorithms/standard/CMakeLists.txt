@@ -30,7 +30,6 @@ target_sources(essentia
     powerspectrum.cpp
     realaccumulator.cpp
     replaygain.cpp
-    resample.cpp
     scale.cpp
     silencerate.cpp
     slicer.cpp
@@ -84,7 +83,6 @@ target_sources(essentia
     powerspectrum.h
     realaccumulator.h
     replaygain.h
-    resample.h
     scale.h
     silencerate.h
     slicer.h
@@ -108,6 +106,13 @@ target_sources(essentia
     warpedautocorrelation.h
     welch.h
     windowing.h)
+
+if(ESSENTIA_USE_LIBSAMPLERATE)
+  target_sources(essentia
+    PRIVATE
+      resample.cpp
+      resample.h)
+endif()
 
 if(ESSENTIA_USE_ACCEL)
   target_sources(essentia
