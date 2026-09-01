@@ -23,6 +23,7 @@
 #include "algorithm.h"
 #include "threading.h"
 #include <complex>
+#undef PC
 #include <Accelerate/Accelerate.h>
 
 namespace essentia {
