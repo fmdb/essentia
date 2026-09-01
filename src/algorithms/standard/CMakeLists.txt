@@ -114,7 +114,7 @@ if(ESSENTIA_USE_LIBSAMPLERATE)
       resample.h)
 endif()
 
-if(ESSENTIA_USE_ACCEL)
+if(ESSENTIA_USE_VDSP)
   target_sources(essentia
     PRIVATE
       ffta.cpp
