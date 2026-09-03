@@ -37,7 +37,7 @@ find_package(FFmpeg)
 find_package(SampleRate QUIET)
 find_package(Taglib QUIET)
 find_package(Chromaprint QUIET)
-find_package(Yaml QUIET)
+find_package(YAML QUIET)
 
 if(BUILD_PYTHON_BINDINGS)
   find_package(Python3 COMPONENTS Development NumPy)
