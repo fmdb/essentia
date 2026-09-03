@@ -81,6 +81,7 @@ else()
   endif()
 
   if(TARGET FFTW3::fftw3f)
+    essentia_package_info(FFTW3f FFTW3::fftw3f)
     set(ESSENTIA_USE_FFTW ON)
   elseif(APPLE AND ACCELERATE_LIBRARIES)
     set(ESSENTIA_USE_VDSP ON)
@@ -111,7 +112,7 @@ if(TARGET Chromaprint::chromaprint)
 endif()
 
 if(TARGET yaml)
-  essentia_package_info(yaml yaml)
+  essentia_package_info(YAML yaml)
   set(ESSENTIA_USE_YAML ON)
 endif()
 
