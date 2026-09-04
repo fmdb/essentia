@@ -56,26 +56,26 @@ CI must be green **before** the force-push, not after. `cmake` is the default br
 
 ## What is intentionally fork-specific
 
-As of 2026-09-01 the delta is 14 commits on top of `wo80/cmake@4d95fc4`. Regenerate with `git log --oneline wo80/cmake..cmake`.
+As of 2026-09-04 the delta is 15 commits on top of `wo80/cmake@bd577a2`. Regenerate with `git log --oneline wo80/cmake..cmake`.
 
 **CI workflow** — `.github/workflows/build-cmake.yml` (8 commits). Fork-specific and staying that way. It builds a six-leg matrix (Linux/macOS/Windows × `USE_TENSORFLOW` ON/OFF) in Release, because `USE_TENSORFLOW=OFF` is what the FMDB desktop app ships and upstream does not exercise it. Upstream's CI serves upstream's needs.
 
-**TensorFlow discovery** — `cmake/modules/FindTensorFlow.cmake` and TF search paths (`8f47e00`, and part of `3b46639`). Fork-specific for now; tied to how this project installs libtensorflow in CI. Revisit if upstream's discovery improves.
-
-**YAML module casing** — `cmake/modules/FindYAML.cmake` (`8d4a189`, and part of `3b46639`). **Sent upstream as #10 below.** Two halves: the call site `find_package(Yaml)` → `YAML` in `CMakeLists.txt`, and the module's own `find_package_handle_standard_args(Yaml)` / `Yaml_FOUND` → `YAML`. Drop both on the rebase after #10 merges.
+**Dependency search paths** — `cmake/modules/FindTensorFlow.cmake`, plus a `PATHS` block in `FindYAML.cmake` covering `/opt/homebrew` and the Debian multiarch library directories. Fork-specific for now; tied to how this project installs libtensorflow in CI. Revisit if upstream's discovery improves.
 
 **Optional-dependency guards** — `src/algorithms/standard/CMakeLists.txt` (2 commits). **Upstream candidates.** `resample` was compiled without libsamplerate, and the vDSP FFT sources were gated on `ESSENTIA_USE_ACCEL`, a variable set nowhere. Neither is FMDB-specific.
 
 **Example placeholder** — `src/examples/streaming_tensorflowpredict.cpp` (1 commit). Trivial; upstream candidate.
 
-### Already sent upstream
+### Upstreamed
 
-| PR | Change | Status |
+| PR | Change | Outcome |
 | --- | --- | --- |
-| [wo80/essentia#10](https://github.com/wo80/essentia/pull/10) | `find_package(Yaml)` → `YAML` at the call site, and the same inside `FindYAML.cmake`. The module file is `FindYAML.cmake`, so on a case-sensitive file system it was never loaded and YAML support was silently disabled | open |
-| [wo80/essentia#11](https://github.com/wo80/essentia/pull/11) | Quote the value expansion in `essentia_check_set`; a list value clobbers a caller-scope variable, an empty value fails configure | open |
+| [wo80/essentia#10](https://github.com/wo80/essentia/pull/10) | `find_package(Yaml)` → `YAML` at the call site, and the same inside `FindYAML.cmake`. The module file is `FindYAML.cmake`, so on a case-sensitive file system it was never loaded and YAML support was silently disabled | merged 2026-09-03 |
+| [wo80/essentia#11](https://github.com/wo80/essentia/pull/11) | Quote the value expansion in `essentia_check_set`; a list value clobbers a caller-scope variable, an empty value fails configure | merged 2026-09-03 |
 
-When one of these merges, drop the corresponding fork commit on the next rebase rather than carrying both.
+Both landed, and the corresponding fork commit was dropped on the next rebase — the delta shrank rather than growing. This is the intended shape: a fix that belongs upstream goes upstream, and the fork stops carrying it.
+
+Note that #11 fixed a bug in upstream's own code that this fork never had. Reading upstream's diff during a rebase is worth the time.
 
 ## Known local-only workaround
 
