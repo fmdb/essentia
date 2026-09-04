@@ -56,7 +56,13 @@ CI must be green **before** the force-push, not after. `cmake` is the default br
 
 ## What is intentionally fork-specific
 
-As of 2026-09-04 the delta is 15 commits on top of `wo80/cmake@bd577a2`. Regenerate with `git log --oneline wo80/cmake..cmake`.
+The delta sits on top of `wo80/essentia@cmake`. List it with:
+
+```bash
+git log --oneline wo80/cmake..cmake
+```
+
+Deliberately no commit count here: any count written into this file is wrong the moment the commit writing it lands. The categories below are the stable part; the command above is the current answer.
 
 **CI workflow** — `.github/workflows/build-cmake.yml` (8 commits). Fork-specific and staying that way. It builds a six-leg matrix (Linux/macOS/Windows × `USE_TENSORFLOW` ON/OFF) in Release, because `USE_TENSORFLOW=OFF` is what the FMDB desktop app ships and upstream does not exercise it. Upstream's CI serves upstream's needs.
 
