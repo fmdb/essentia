@@ -72,6 +72,8 @@ Deliberately no commit count here: any count written into this file is wrong the
 
 **Example placeholder** — `src/examples/streaming_tensorflowpredict.cpp` (1 commit). Trivial; upstream candidate.
 
+**ML preprocessing decoupling** — `USE_ML_PREPROCESSING` across the root `CMakeLists.txt`, `src/CMakeLists.txt`, `src/algorithms/spectral/CMakeLists.txt` and the generated registry (1 commit). **Upstream candidate.** The four `TensorflowInput*` algorithms compute log-compressed mel bands and have no TensorFlow dependency, yet CMake gated them on `USE_TENSORFLOW`, so a TensorFlow-less build shipped without the preprocessing stage its models need. waf never had this problem: its algorithm-ignore list names only `TensorflowPredict*`, `PitchCREPE` and `TempoCNN`. This aligns CMake with waf rather than adding fork-specific behavior.
+
 ### Upstreamed
 
 | PR | Change | Outcome |
